@@ -3,13 +3,16 @@ plugins {
     id 'application'
     // shadow plugin to produce fat JARs
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    // Spring boot
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
 }
 // artifact properties
 group = 'org.quickstart'
 version = '0.1-SNAPSHOT'
 
 ext {
-    javaVersion = '1.8'
+    javaVersion = '1.17'
     flinkVersion = '1.16.2'
     scalaBinaryVersion = '_2.12'
     slf4jVersion = '1.7.32'
@@ -46,6 +49,12 @@ configurations {
 }
 // declare the dependencies for your production and test code
 dependencies {
+    // Spring Boot Dependencies -- START
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Spring Boot Dependencies -- END
+
     // --------------------------------------------------------------
     // Compile-time dependencies that should NOT be part of the
     // shadow (uber) jar and are provided in the lib folder of Flink
