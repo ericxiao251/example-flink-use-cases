@@ -2,14 +2,19 @@ package org.simpleWebServer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import org.simpleWebServer.Coffee.CoffeeSize;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 // This annotation instructs Spring to initialize its configuration - which is needed to start a new application
 @SpringBootApplication
@@ -30,10 +35,25 @@ public class Main {
 
     @GetMapping("/coffee")
     public ResponseEntity<Coffee> getCoffee(
+            @RequestHeader HttpHeaders headers,
             @RequestParam(name="name") String name,
             @RequestParam(name="size") String size
     ) throws InterruptedException {
         long startTime = System.currentTimeMillis();
+
+        if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized request for coffee.");
+        }
+        String authorization = headers.getFirst(HttpHeaders.AUTHORIZATION);
+        if (authorization != null && authorization.toLowerCase().startsWith("basic")) {
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+            String credentials = new String(credDecoded, StandardCharsets.UTF_8);
+            final String[] values = credentials.split(":", 2);
+            if (!(values[0].equals("Coffee drinker") && values[1].equals("I love coffee"))) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized coffee drinker :).");
+            }
+        }
 
         CoffeeSize coffeeSize;
         try {
