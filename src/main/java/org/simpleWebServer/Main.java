@@ -22,17 +22,8 @@ public class Main {
         3. Retries: ___.
      */
 
-    // We can start our application by calling the run method with the primary class
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
-    }
-
-    // The `GetMapping` annotation indicates that this method should be called
-    // when handling GET requests to the "/simple-request" endpoint
-    @GetMapping("/hello-world")
-    public String helloWorldRequest() {
-        // In this case, we return the plain text response "ok"
-        return "Hello World";
     }
 
     @GetMapping("/coffee")
