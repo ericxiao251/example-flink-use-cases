@@ -11,6 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 // Indicates that this class contains RESTful methods to handle incoming HTTP requests
 @RestController
 public class Main {
+    // Following this tutorial: https://www.sohamkamani.com/java/spring-rest-http-server/#google_vignette
+    /* TODO:
+        1. Auth: Store secrets somewhere (not in code) and use request headers.
+        2. Async: Enable concurrent requests to the web-server.
+        3. Timeout: Introduce artificial lag with sleeps to simulate retries?
+        3. Retries: ___.
+     */
 
     // We can start our application by calling the run method with the primary class
     public static void main(String[] args) {
