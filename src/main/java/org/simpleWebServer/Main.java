@@ -2,9 +2,12 @@ package org.simpleWebServer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 // This annotation instructs Spring to initialize its configuration - which is needed to start a new application
 @SpringBootApplication
@@ -33,11 +36,35 @@ public class Main {
     }
 
     @GetMapping("/coffee")
-    public Coffee getCoffee(@RequestParam(name="name") String name, @RequestParam(name="size") String size) {
-        Coffee coffee = new Coffee();
-        coffee.setName(name);
-        coffee.setSize(size);
+    public ResponseEntity<Coffee> getCoffee(
+            @RequestParam(name="name") String name,
+            @RequestParam(name="size") String size
+    ) throws InterruptedException {
+        long startTime = System.currentTimeMillis();
 
-        return coffee;
+        if (size.equals("XL")) {
+            // Don't serve extra large coffees.
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Extra large coffees are not available at this time.");
+        } else if (size.equals("L")) {
+            // Large coffees take 0 - 5 seconds.
+            int sleepInterval = (int) (Math.random() * 5000);
+            Thread.sleep(sleepInterval);
+
+            Coffee coffee = new Coffee();
+            coffee.setName(name);
+            coffee.setSize(size);
+            long endTime = System.currentTimeMillis();
+            coffee.setPrepTime(endTime - startTime);
+
+            return new ResponseEntity<>(coffee, HttpStatus.OK);
+        } else {
+            Coffee coffee = new Coffee();
+            coffee.setName(name);
+            coffee.setSize(size);
+            long endTime = System.currentTimeMillis();
+            coffee.setPrepTime(endTime - startTime);
+
+            return new ResponseEntity<>(coffee, HttpStatus.OK);
+        }
     }
 }
