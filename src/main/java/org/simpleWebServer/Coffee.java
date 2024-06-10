@@ -1,11 +1,16 @@
 package org.simpleWebServer;
 
 public class Coffee {
-    private String size;
+
+    public enum CoffeeSize {
+        S, M, L, XL;
+    }
+
+    private CoffeeSize size;
     private String name;
     private long prepTime;
 
-    public String getSize() {
+    public CoffeeSize getSize() {
         return this.size;
     }
 
@@ -17,7 +22,7 @@ public class Coffee {
         return this.prepTime;
     }
 
-    public void setSize(String size) {
+    public void setSize(CoffeeSize size) {
         this.size = size;
     }
 

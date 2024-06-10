@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.simpleWebServer.Coffee.CoffeeSize;
+
 // This annotation instructs Spring to initialize its configuration - which is needed to start a new application
 @SpringBootApplication
 // Indicates that this class contains RESTful methods to handle incoming HTTP requests
@@ -33,17 +35,24 @@ public class Main {
     ) throws InterruptedException {
         long startTime = System.currentTimeMillis();
 
-        if (size.equals("XL")) {
+        CoffeeSize coffeeSize;
+        try {
+            coffeeSize = Coffee.CoffeeSize.valueOf(size);
+        } catch (IllegalArgumentException ignored) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No coffee size of %s.".formatted(size));
+        }
+
+        if (coffeeSize.equals(CoffeeSize.XL)) {
             // Don't serve extra large coffees.
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Extra large coffees are not available at this time.");
-        } else if (size.equals("L")) {
+        } else if (coffeeSize.equals(CoffeeSize.L)) {
             // Large coffees take 0 - 5 seconds.
             int sleepInterval = (int) (Math.random() * 5000);
             Thread.sleep(sleepInterval);
 
             Coffee coffee = new Coffee();
             coffee.setName(name);
-            coffee.setSize(size);
+            coffee.setSize(coffeeSize);
             long endTime = System.currentTimeMillis();
             coffee.setPrepTime(endTime - startTime);
 
@@ -51,7 +60,7 @@ public class Main {
         } else {
             Coffee coffee = new Coffee();
             coffee.setName(name);
-            coffee.setSize(size);
+            coffee.setSize(coffeeSize);
             long endTime = System.currentTimeMillis();
             coffee.setPrepTime(endTime - startTime);
 
