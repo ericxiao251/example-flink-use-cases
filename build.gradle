@@ -13,7 +13,7 @@ version = '0.1-SNAPSHOT'
 
 ext {
     javaVersion = '1.17'
-    flinkVersion = '1.16.2'
+    flinkVersion = '1.18.1'
     scalaBinaryVersion = '_2.12'
     slf4jVersion = '1.7.32'
     log4jVersion = '2.17.1'
