@@ -14,23 +14,22 @@ public class Main {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         DataStream<String> inputStream = env.fromElements(
-                "5"
-                ,"6"
-                ,"7"
-                ,"8"
-                ,"9"
+                "L"
+                ,"M"
+                ,"S"
+                ,"L"
+                ,"XL"
         );
-        inputStream.print();
 
         // TODO: Flink retries.
-        DataStream<String> outputStream = AsyncDataStream.unorderedWait(
+        DataStream<CoffeeOrder> outputStream = AsyncDataStream.unorderedWait(
                 inputStream,
-                new PokemonHttpOperator(),
+                new CoffeeOrderHttpOperator(),
                 2,
                 TimeUnit.MINUTES,
                 1000
         );
-        outputStream.print();
+//        outputStream.print();
 
         env.execute();
     }
