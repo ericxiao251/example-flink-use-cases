@@ -1,17 +1,25 @@
 package org.dummyPipeline;
 
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.PipelineOptions;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 public class Main {
     public static void main(String[] args) throws Exception {
         //src.main.java.org.dummyPipeline.Main
         // Set up the execution environment
-        Configuration conf = new Configuration();
-        conf.setInteger("taskmanager.numberOfTaskSlots", 2);
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(conf);
+//        Configuration conf = new Configuration();
+//        conf.setString("taskmanager.numberOfTaskSlots", "10");
+//        conf.setInteger("taskmanager.numberOfTaskSlots", 10);
+//        conf.setLong("taskmanager.numberOfTaskSlots", 10L);
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+
+        tableEnv.getConfig().getConfiguration().setInteger("taskmanager.numberOfTaskSlots", 10);
+        tableEnv.getConfig().getConfiguration().setString(PipelineOptions.NAME, "test setting");
 //        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Create a DataStream using a custom SourceFunction
