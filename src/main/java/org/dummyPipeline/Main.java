@@ -1,13 +1,18 @@
 package org.dummyPipeline;
 
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        //src.main.java.org.dummyPipeline.Main
         // Set up the execution environment
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        Configuration conf = new Configuration();
+        conf.setInteger("taskmanager.numberOfTaskSlots", 2);
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(conf);
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Create a DataStream using a custom SourceFunction
         DataStream<Integer> stream = env.addSource(new IncrementingSource());
