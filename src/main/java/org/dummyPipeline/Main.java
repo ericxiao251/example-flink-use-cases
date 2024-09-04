@@ -1,51 +1,61 @@
 package org.dummyPipeline;
 
+import org.apache.flink.api.common.state.MapState;
+import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.PipelineOptions;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.util.Collector;
 
 public class Main {
     public static void main(String[] args) throws Exception {
         //src.main.java.org.dummyPipeline.Main
         // Set up the execution environment
-//        Configuration conf = new Configuration();
-//        conf.setString("taskmanager.numberOfTaskSlots", "10");
-//        conf.setInteger("taskmanager.numberOfTaskSlots", 10);
-//        conf.setLong("taskmanager.numberOfTaskSlots", 10L);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
-
-        tableEnv.getConfig().getConfiguration().setInteger("taskmanager.numberOfTaskSlots", 10);
-        tableEnv.getConfig().getConfiguration().setString(PipelineOptions.NAME, "test setting");
-//        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Create a DataStream using a custom SourceFunction
-        DataStream<Integer> stream = env.addSource(new IncrementingSource());
+        DataStream<String> stream = env.addSource(new IncrementingSource());
+        stream
+                .keyBy(value -> value)
+                .process(new KeyedProcessFunction<String, String, String>() {
+                    private MapState<String, String> state;
 
-        // Print the stream to standard out
-        stream.print();
+                    @Override
+                    public void open(Configuration parameters) throws Exception {
+                        super.open(parameters);
+                        state = getRuntimeContext().getMapState(new MapStateDescriptor<>(
+                                "state",
+                                String.class,
+                                String.class
+                        ));
+                    }
+
+                    @Override
+                    public void processElement(String key, Context ctx, Collector<String> out) throws Exception {
+                        // Accumulate a large amount of state
+                        state.put(key, key);
+                        System.out.println(state.entries());
+                    }
+                });
 
         // Execute the job
-        env.execute("Incrementing DataStream");
+        env.execute();
     }
 
     // Custom SourceFunction to emit incrementing integers
-    public static class IncrementingSource implements SourceFunction<Integer> {
+    public static class IncrementingSource implements SourceFunction<String> {
         private volatile boolean isRunning = true;
-        private int current = 0;
+        private Long current = 0L;
 
         @Override
-        public void run(SourceContext<Integer> ctx) throws Exception {
+        public void run(SourceContext<String> ctx){
             while (isRunning) {
                 // Emit the current value
-                ctx.collect(current);
+                ctx.collect(current.toString());
                 // Increment the value
                 current++;
-                // Sleep for 5 seconds
-                Thread.sleep(5000);
             }
         }
 

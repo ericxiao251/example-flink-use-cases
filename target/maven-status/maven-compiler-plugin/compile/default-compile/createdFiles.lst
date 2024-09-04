@@ -1,0 +1,4 @@
+META-INF/decodable/stream-names.properties
+org/dummyPipeline/Main$IncrementingSource.class
+org/dummyPipeline/Main$1.class
+org/dummyPipeline/Main.class
