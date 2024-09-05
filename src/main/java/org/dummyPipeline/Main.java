@@ -1,5 +1,6 @@
 package org.dummyPipeline;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.configuration.Configuration;
@@ -9,6 +10,8 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.Collector;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -49,9 +52,12 @@ public class Main {
     public static class IncrementingSource implements SourceFunction<String> {
         private volatile boolean isRunning = true;
         private Long current = 0L;
+        final private int length = 1000;
+        private Map<String, String> map = new HashMap<>();
 
         @Override
-        public void run(SourceContext<String> ctx) throws InterruptedException {
+        public void run(SourceContext<String> ctx) {
+            /*
             while (isRunning) {
                 // Emit the current value
                 ctx.collect(current.toString());
@@ -60,6 +66,13 @@ public class Main {
                 // sleep
                 TimeUnit.SECONDS.sleep(10);
             }
+            */
+            System.out.println("Starting while loop.");
+            while (true) {
+                map.put(StringUtils.repeat(current.toString(), length), StringUtils.repeat(current.toString(), length));
+                current++;
+            }
+
         }
 
         @Override
