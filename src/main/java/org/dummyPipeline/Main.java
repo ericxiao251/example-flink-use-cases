@@ -9,6 +9,8 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.Collector;
 
+import java.util.concurrent.TimeUnit;
+
 public class Main {
     public static void main(String[] args) throws Exception {
         //src.main.java.org.dummyPipeline.Main
@@ -36,7 +38,6 @@ public class Main {
                     public void processElement(String key, Context ctx, Collector<String> out) throws Exception {
                         // Accumulate a large amount of state
                         state.put(key, key);
-                        System.out.println(state.entries());
                     }
                 });
 
@@ -50,12 +51,14 @@ public class Main {
         private Long current = 0L;
 
         @Override
-        public void run(SourceContext<String> ctx){
+        public void run(SourceContext<String> ctx) throws InterruptedException {
             while (isRunning) {
                 // Emit the current value
                 ctx.collect(current.toString());
                 // Increment the value
                 current++;
+                // sleep
+                TimeUnit.SECONDS.sleep(10);
             }
         }
 
